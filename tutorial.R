@@ -262,6 +262,50 @@ fobject %>% performance_and_fairness(fairness_metric = 'FPR', performance_metric
 
 ################# Exercise #################
 
-# As for the exercise check fairness for the same models but with protected vector equal to df$sex
+# As for the exercise: check fairness for the same models but with protected vector equal to df$sex
+
+
+################# Regression Module #################
+
+
+
+
+# Now we will try to predict the decile score of the system.
+# It is not "true" value so have it in mind
+# It look like this
+
+
+ggplot(df[c('race', 'decile_score')], aes(x=decile_score)) + geom_bar() + facet_grid(~race)
+
+# lets build a model to predict such scores decile scores
+
+df_reg <- df[, ! colnames(df)  %in% c('two_year_recid', 'v_decile_score')]
+head(df_reg)
+
+rf_reg <- ranger::ranger(decile_score ~., data = df_reg)
+
+rf_reg_explainer <- DALEX::explain(rf_reg, data = df_reg, y = df$decile_score)
+
+fairness_check(rf_reg_explainer, protected = df$race, privileged = "Caucasian")
+
+
+fairness_check_regression(rf_reg_explainer, protected = df$race, privileged = "Caucasian")
+
+fobject_reg <- fairness_check_regression(rf_reg_explainer, protected = df$race, privileged = "Caucasian")
+
+plot(fobject_reg)
+
+# How we interpret that?
+
+
+
+
+
+
+
+
+
+
+
 
 
